@@ -23,6 +23,9 @@
   <arg name="launch_planning" default="true" description="launch planning"/>
   <arg name="launch_control" default="true" description="launch control"/>
   <arg name="launch_api" default="true" description="launch api"/>
+  <arg name="launch_tier4_api" default="true" description="launch TIER IV API for Web.Auto Agent"/>
+  <arg name="api_mode" default="1" description="TIER IV API mode: 0(All), 1(Without 2025/09 EOL API), 2(Without 2025/12 EOL API)"/>
+  <arg name="rosbridge_enabled" default="true" description="enable rosbridge for Web.Auto Agent"/>
   <!-- Global parameters -->
   <arg name="use_sim_time" default="false" description="use_sim_time"/>
   <!-- Vehicle -->
@@ -139,6 +142,9 @@
     <include file="$(find-pkg-share autoware_launch)/launch/components/tier4_autoware_api_component.launch.xml">
       <arg name="use_sim_time" value="$(var use_sim_time)"/>
       <arg name="vehicle_model" value="$(var vehicle_model)"/>
+      <arg name="launch_tier4_api" value="$(var launch_tier4_api)"/>
+      <arg name="api_mode" value="$(var api_mode)"/>
+      <arg name="rosbridge_enabled" value="$(var rosbridge_enabled)"/>
     </include>
   </group>
 

@@ -5,6 +5,13 @@
   <arg name="use_sim_time" default="false"/>
   <arg name="vehicle_model" default="sample_vehicle"/>
 
+  <!-- TIER IV API (Web.Auto Agent). Default true so Autoware launches ready for Agent. -->
+  <arg name="launch_tier4_api" default="true"/>
+  <arg name="rosbridge_enabled" default="true"/>
+  <arg name="rosbridge_max_message_size" default="1000000000"/>
+  <!-- Pilot.Auto / Web.Auto alignment: keep 2025/12 EOL APIs (engage/route/...) -->
+  <arg name="api_mode" default="1" description="options: 0(All), 1(Without 2025/09 EOL API), 2(Without 2025/12 EOL API)"/>
+
   <!-- Global parameters -->
   <group scoped="false">
     <include file="$(find-pkg-share autoware_global_parameter_loader)/launch/global_params.launch.py">
@@ -13,7 +20,23 @@
     </include>
   </group>
 
-  <include file="$(find-pkg-share tier4_autoware_api_launch)/launch/autoware_api.launch.xml">
-    <arg name="launch_evaluation_adapter" value="$(var scenario_simulation)"/>
-  </include>
+  <!-- evaluation_adapter conflicts with TIER IV API interface names -->
+  <let name="launch_evaluation_adapter" value="false" if="$(var launch_tier4_api)"/>
+  <let name="launch_evaluation_adapter" value="$(var scenario_simulation)" unless="$(var launch_tier4_api)"/>
+
+  <!-- AD API -->
+  <group>
+    <include file="$(find-pkg-share tier4_autoware_api_launch)/launch/autoware_api.launch.xml">
+      <arg name="launch_evaluation_adapter" value="$(var launch_evaluation_adapter)"/>
+    </include>
+  </group>
+
+  <!-- TIER IV API for Web.Auto Agent -->
+  <group if="$(var launch_tier4_api)">
+    <include file="$(find-pkg-share tier4_autoware_api_extension_launch)/launch/tier4_autoware_api_extension.launch.xml">
+      <arg name="api_mode" value="$(var api_mode)"/>
+      <arg name="rosbridge_enabled" value="$(var rosbridge_enabled)"/>
+      <arg name="rosbridge_max_message_size" value="$(var rosbridge_max_message_size)"/>
+    </include>
+  </group>
 </launch>
